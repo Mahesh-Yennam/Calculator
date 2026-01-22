@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Calculator</title>
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+        background-color: #121212;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .container {
+        width: 310px;
+        background-color: #1e1e1e;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        /* border: 1px solid red; */
+      }
+      .title {
+        text-align: center;
+        /* border: 1px solid red; */
+        font-size: 40px;
+        margin-bottom: 20px;
+      }
+      .input {
+        text-align: right;
+        /* border: 1px solid red; */
+        height: 20px;
+        font-size: 20px;
+        /* margin-bottom: 10px; */
+      }
+      .output {
+        text-align: right;
+        /* border: 1px solid red; */
+        height: 40px;
+        font-size: 40px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+      }
+      .buttons {
+        /* border: 1px solid red; */
+        display: flex;
+        justify-content: flex-start;
+        gap: 10px;
+        width: 310px;
+        margin-top: 10px;
+      }
+      button {
+        font-size: 30px;
+        /* border: none; */
+        border-radius: 50%;
+        background-color: #333;
+        color: white;
+        cursor: pointer;
+        height: 70px;
+        width: 70px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="title">Calculator</div>
+      <div class="input"></div>
+      <div class="output">0</div>
+      <div class="buttons">
+        <button onclick="calculate('<')">⮜</button>
+        <button onclick="calculate('AC')">AC</button>
+        <button onclick="calculate('%')">%</button>
+        <button onclick="calculate('/')">/</button>
+      </div>
+      <div class="buttons">
+        <button onclick="calculate('7')">7</button>
+        <button onclick="calculate('8')">8</button>
+        <button onclick="calculate('9')">9</button>
+        <button onclick="calculate('*')">*</button>
+      </div>
+      <div class="buttons">
+        <button onclick="calculate('4')">4</button>
+        <button onclick="calculate('5')">5</button>
+        <button onclick="calculate('6')">6</button>
+        <button onclick="calculate('-')">-</button>
+      </div>
+      <div class="buttons">
+        <button onclick="calculate('1')">1</button>
+        <button onclick="calculate('2')">2</button>
+        <button onclick="calculate('3')">3</button>
+        <button onclick="calculate('+')">+</button>
+      </div>
+      <div class="buttons">
+        <button onclick="calculate('+/-')">+/-</button>
+        <button onclick="calculate('0')">0</button>
+        <button onclick="calculate('.')">.</button>
+        <button onclick="calculate('=')">=</button>
+      </div>
+    </div>
+
+    <script>
+      let value1 = "";
+      let operator = "";
+      let value2 = "";
+      let result = "";
+      const input = document.querySelector(".input");
+      const output = document.querySelector(".output");
+
+      function handleValues(value) {
+        if (value === "." && value1.includes(".")) return;
+        if (value === "." && value2.includes(".")) return;
+        if (result != "") {
+          input.innerHTML = "";
+          operator = "";
+          value2 = "";
+          value1 = value;
+          output.innerHTML = value1;
+          result = "";
+        } else if (value1 == "" && operator == "-") {
+          value1 = operator + value;
+          output.innerHTML = value1;
+          operator = "";
+        } else if (value1 != "" && operator != "") {
+          value2 += value;
+          output.innerHTML = value1 + operator + value2;
+        } else {
+          if (value == "." && value1 == "") value1 = "0.";
+          else value1 += value;
+          output.innerHTML = value1;
+        }
+      }
+
+      function setOperator(op) {
+        operator = op;
+
+        if (result) {
+          value1 = result;
+          value2 = "";
+          result = "";
+          input.innerHTML = "";
+        }
+        if (value1 == "" && operator != "-") {
+          value1 = "0";
+        }
+        if (operator == "%") {
+          value1 = `${value1}${operator}`;
+          operator = "";
+        }
+        output.innerHTML = `${value1}${operator}`;
+      }
+
+      function handleResult() {
+        value1 = String(value1);
+        value2 = String(value2);
+        if (value1.indexOf("%") > -1) {
+          result = value1.slice(0, -1) / 100;
+          output.innerHTML = result;
+        }
+        if (value2 == "") return;
+        if (result) {
+          value1 = result;
+        }
+        switch (operator) {
+          case "+":
+            result = Number(value1) + Number(value2);
+            break;
+          case "-":
+            result = Number(value1) - Number(value2);
+            break;
+          case "*":
+            result = Number(value1) * Number(value2);
+            break;
+          case "/":
+            result =
+              Number(value2) !== 0 ? Number(value1) / Number(value2) : "Error";
+            break;
+          default:
+            result = "Invalid operator";
+            break;
+        }
+
+        if (value2.includes("-")) {
+          input.innerHTML = value1 + operator + "(" + value2 + ")";
+        } else {
+          input.innerHTML = value1 + operator + value2;
+        }
+        output.innerHTML = String(parseFloat(result.toFixed(4)));
+        result = String(parseFloat(result.toFixed(4)));
+      }
+
+      function handleOperator(value) {
+        if (result) {
+          value1 = result;
+          operator = "";
+          value2 = "";
+          result = "";
+          input.innerHTML = "";
+        }
+        if (value1 == "") return;
+        if (operator == "-") {
+          operator = "+";
+          output.innerHTML = value1 + operator + value2;
+        } else if (operator == "+") {
+          if (value2) {
+            value2 = -value2;
+            if (value2 < 0)
+              output.innerHTML = value1 + operator + "(" + value2 + ")";
+            else output.innerHTML = value1 + operator + value2;
+          }
+        } else if (operator == "") {
+          value1 = -value1;
+          output.innerHTML = value1 || "0";
+        }
+      }
+
+      function clearAll() {
+        value1 = "";
+        operator = "";
+        value2 = "";
+        result = "";
+        input.innerHTML = "";
+        output.innerHTML = "0";
+      }
+
+      function handleBack() {
+        if (result) {
+          result = result.slice(0, -1);
+          input.innerHTML = "";
+          output.innerHTML = result;
+          return;
+        }
+        if (value2) {
+          value2 = String(value2);
+          value2 = value2.slice(0, -1);
+          if (value2.includes("-")) {
+            if (value2.length == 1) {
+              value2 = "";
+              output.innerHTML = value1 + operator;
+              return;
+            }
+            output.innerHTML = value1 + operator + "(" + value2 + ")";
+            return;
+          }
+          output.innerHTML = value1 + operator + value2;
+          return;
+        }
+        if (operator) {
+          operator = "";
+          output.innerHTML = value1 || 0;
+          return;
+        }
+        if (value1) {
+          value1 = value1.slice(0, -1);
+          output.innerHTML = value1;
+          return;
+        }
+        output.innerHTML = "0";
+      }
+
+      function calculate(value) {
+        switch (true) {
+          case /^[0-9]$/.test(value):
+            handleValues(value);
+            break;
+          case value == "<":
+            handleBack();
+            break;
+          case value == "AC":
+            clearAll();
+            break;
+          case value == "%":
+            setOperator(value);
+            break;
+          case value == "/":
+            setOperator(value);
+            break;
+          case value == "*":
+            setOperator(value);
+            break;
+          case value == "-":
+            setOperator(value);
+            break;
+          case value == "+":
+            setOperator(value);
+            break;
+          case value == "+/-":
+            handleOperator(value);
+            break;
+          case value == ".":
+            handleValues(value);
+            break;
+          case value == "=":
+            handleResult();
+            break;
+          default:
+            break;
+        }
+      }
+    </script>
+  </body>
+</html>
