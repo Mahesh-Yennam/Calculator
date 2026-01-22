@@ -228,10 +228,13 @@
       }
 
       function handleBack() {
-        if (result) {
+      console.log(result)
+        if (result != '') {
+          value1 = '';
+          value2 = ''
           result = result.slice(0, -1);
           input.innerHTML = "";
-          output.innerHTML = result;
+          output.innerHTML = result || 0;
           return;
         }
         if (value2) {
